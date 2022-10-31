@@ -68,7 +68,7 @@ jobs:
             echo "setting found to true"
             found=true
             echo "setting outputs"
-            echo "::set-output name=deployment-metadata-path::$changed_file"
+            echo "::setOutput name=deployment-metadata-path::$changed_file"
           fi
         done
         if [[ "$found" == false ]]; then
@@ -80,18 +80,18 @@ jobs:
       id: get-data
       run: |
         modified_resource_arn=$(jq -r '(.resourceMetadata.arn // .componentMetadata.arn)' ${{ steps.find-modified.outputs.deployment-metadata-path }})
-        echo "::set-output name=resource_arn::$modified_resource_arn"
+        echo "::setOutput name=resource_arn::$modified_resource_arn"
         
         IFS=':'
         read -a split_arn <<< "$modified_resource_arn"
         proton_region=${split_arn[3]}
-        echo "::set-output name=proton_region::$proton_region"
+        echo "::setOutput name=proton_region::$proton_region"
 
         deployment_id=$(jq -r '.deploymentId' ${{ steps.find-modified.outputs.deployment-metadata-path }})
-        echo "::set-output name=deployment_id::$deployment_id"
+        echo "::setOutput name=deployment_id::$deployment_id"
 
         is_deleted=$(jq -r '.isResourceDeleted' ${{ steps.find-modified.outputs.deployment-metadata-path }})
-        echo "::set-output name=is_deleted::$is_deleted"
+        echo "::setOutput name=is_deleted::$is_deleted"
 
 
         if [[ "$modified_resource_arn" == *":environment/"* ]]; then
@@ -144,12 +144,12 @@ jobs:
           fi
         fi
         
-        echo "::set-output name=working_directory::$working_directory"
-        echo "::set-output name=environment::$environment_name"
+        echo "::setOutput name=working_directory::$working_directory"
+        echo "::setOutput name=environment::$environment_name"
         
-        echo "::set-output name=role_arn::$role_arn"
-        echo "::set-output name=target_region::$target_region"
-        echo "::set-output name=state_bucket::$state_bucket"
+        echo "::setOutput name=role_arn::$role_arn"
+        echo "::setOutput name=target_region::$target_region"
+        echo "::setOutput name=state_bucket::$state_bucket"
 
   terraform:
     name: 'Terraform'
@@ -220,7 +220,7 @@ jobs:
     # If this completes, then the entire workflow has successfully completed
     - name: Mark Success
       id: mark_success
-      run: echo "::set-output name=success::True"
+      run: echo "::setOutput name=success::True"
 
   notify-proton:
     name: 'Notify Proton'
