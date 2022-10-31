@@ -7,7 +7,7 @@ on:
   pull_request:
     types:
       - opened
-      - reopened
+
     paths:
       - '**/.proton/deployment-metadata.json'
   push:
@@ -42,14 +42,7 @@ jobs:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Verify env_config updated
-      run: |
-        if grep -q REPLACE_ME env_config.json; then
-          echo "You must update env_config.json or update this workflow to not require it."
-          exit 1
-        fi
-      
+     
     - name: Get changed files
       id: files
       uses: jitterbit/get-changed-files@v1
@@ -129,22 +122,7 @@ jobs:
           component_name=${split_resources[1]}
           working_directory=$environment_name/$component_name/  
         fi
-
-        if [[ $(jq -r --arg env $environment_name 'has($env)' env_config.json) = "true" ]]; then
-          role_arn=$(jq -r --arg env $environment_name '.[$env]["role"]' env_config.json)
-          target_region=$(jq -r --arg env $environment_name '.[$env]["region"]' env_config.json)
-          state_bucket=$(jq -r --arg env $environment_name '.[$env]["state_bucket"]' env_config.json)   
-        else     
-          if [[ $(jq -r --arg env $environment_name 'has("*")' env_config.json) = "true" ]]; then
-            role_arn=$(jq -r --arg env $environment_name '.["*"]["role"]' env_config.json)
-            target_region=$(jq -r --arg env $environment_name '.["*"]["region"]' env_config.json)
-            state_bucket=$(jq -r --arg env $environment_name '.["*"]["state_bucket"]' env_config.json)
-          else
-            echo "Missing $environment_name or * from env_config.json, exiting"
-            exit 1
-          fi
-        fi
-        
+       
         echo "working_directory=$working_directory" >> $GITHUB_OUTPUT
         echo "environment=$environment_name" >> $GITHUB_OUTPUT
         
