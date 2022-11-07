@@ -68,7 +68,11 @@ resource "aws_codebuild_project" "build_project" {
                     },
                     "pre_build": {
                       "commands": [
+                        "pwd",
+                        "ls",
                         "cd $CODEBUILD_SRC_DIR/${var.pipeline.inputs.code_dir}",
+                        "pwd",
+                        "ls",
                         "${var.pipeline.inputs.unit_test_command}"
                       ]
                     },
